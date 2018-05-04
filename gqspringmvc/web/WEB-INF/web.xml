@@ -1,0 +1,44 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<web-app xmlns="http://xmlns.jcp.org/xml/ns/javaee"
+         xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+         xsi:schemaLocation="http://xmlns.jcp.org/xml/ns/javaee http://xmlns.jcp.org/xml/ns/javaee/web-app_3_1.xsd"
+         version="3.1">
+    <!--
+    <listener>
+        <listener-class>org.springframework.web.context.ContextLoaderListener</listener-class>
+    </listener>-->
+    <!--2、部署applicationContext的xml文件-->
+    <!--如果在web.xml中不写任何参数配置信息，默认的路径是"/WEB-INF/applicationContext.xml，
+    在WEB-INF目录下创建的xml文件的名称必须是applicationContext.xml。
+    如果是要自定义文件名可以在web.xml里加入contextConfigLocation这个context参数：
+    在<param-value> </param-value>里指定相应的xml文件名，如果有多个xml文件，可以写在一起并以“,”号分隔。
+    也可以这样applicationContext-*.xml采用通配符，比如这那个目录下有applicationContext-ibatis-base.xml，
+    applicationContext-action.xml，applicationContext-ibatis-dao.xml等文件，都会一同被载入。
+    在ContextLoaderListener中关联了ContextLoader这个类，所以整个加载配置过程由ContextLoader来完成。-->
+    <!-- <context-param>
+         <param-name>contextConfigLocation</param-name>
+         <param-value>classpath:spring/applicationContext.xml</param-value>
+     </context-param>-->
+
+     <servlet>
+         <servlet-name>GqDispatchServlet</servlet-name>
+         <servlet-class>org.gq.spring.mvc.GqDispatchServlet</servlet-class>
+
+         <!--<init-param>-->
+            <!-- <param-name>contextConfigLocation</param-name>-->
+             <!--其中<param-value>**.xml</param-value> 这里可以使用多种写法-->
+            <!--1、不写,使用默认值:/WEB-INF/<servlet-name>-servlet.xml-->
+            <!--2、<param-value>/WEB-INF/classes/dispatcher-servlet.xml</param-value>-->
+            <!--3、<param-value>classpath*:dispatcher-servlet.xml</param-value>-->
+            <!--4、多个值用逗号分隔-->
+         <!-- <param-value>classpath:spring-mvc.xml</param-value>-->
+         <!--</init-param>-->
+       <load-on-startup>1</load-on-startup><!--是启动顺序，让这个Servlet随Servletp容器一起启动。-->
+    </servlet>
+    
+    <servlet-mapping>
+        <servlet-name>GqDispatchServlet</servlet-name>
+        <url-pattern>*.do</url-pattern>
+    </servlet-mapping>
+
+</web-app>
