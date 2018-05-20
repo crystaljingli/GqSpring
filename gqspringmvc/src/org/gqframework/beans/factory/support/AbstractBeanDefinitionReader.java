@@ -15,8 +15,12 @@ public abstract class AbstractBeanDefinitionReader
         implements EnvironmentCapable, BeanDefinitionReader {
 
     protected final Logger logger = Logger.getLogger(getClass());
+    @Nullable
+    private ClassLoader beanClassLoader;
 
     private final BeanDefinitionRegistry registry;
+    //Bean name 生成器
+    private BeanNameGenerator beanNameGenerator = new DefaultBeanNameGenerator();
 
     public AbstractBeanDefinitionReader(BeanDefinitionRegistry registry){
         this.registry = registry;
@@ -24,6 +28,14 @@ public abstract class AbstractBeanDefinitionReader
 
     public BeanDefinitionRegistry getRegistry() {
         return registry;
+    }
+
+    public BeanNameGenerator getBeanNameGenerator(){
+        return this.beanNameGenerator;
+    }
+
+    public void setBeanClassLoader(@Nullable ClassLoader beanClassLoader) {
+        this.beanClassLoader = beanClassLoader;
     }
 
     public int loadBeanDefinitions(String location, @Nullable Set<Resource> actualResources) throws BeanDefinitionStoreException {

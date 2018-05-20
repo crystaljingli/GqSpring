@@ -18,8 +18,10 @@ package org.gqframework.beans.factory.xml;
 
 import java.io.StringReader;
 
+import org.gqframework.beans.factory.config.BeanDefinition;
 import org.gqframework.beans.factory.parsing.ReaderContext;
 import org.gqframework.beans.factory.support.BeanDefinitionReader;
+import org.gqframework.beans.factory.support.BeanDefinitionRegistry;
 import org.gqframework.core.io.Resource;
 import org.w3c.dom.Document;
 import org.xml.sax.InputSource;
@@ -35,5 +37,17 @@ public class XmlReaderContext extends ReaderContext{
             , XmlBeanDefinitionReader reader){
         super(resource);
         this.reader = reader;
+    }
+
+    public final BeanDefinitionRegistry getRegistry() {
+        return this.reader.getRegistry();
+    }
+
+    public String generateBeanName(BeanDefinition beanDefinition) {
+        return this.reader.getBeanNameGenerator().generateBeanName(beanDefinition, getRegistry());
+    }
+
+    public ClassLoader getBeanClassLoader(){
+        return this.reader.getBeanClassLoader();
     }
 }

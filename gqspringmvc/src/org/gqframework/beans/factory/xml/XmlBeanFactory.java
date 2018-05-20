@@ -4,11 +4,16 @@ import org.gqframework.beans.factory.BeanDefinitionStoreException;
 import org.gqframework.beans.factory.NoSuchBeanDefinitionException;
 import org.gqframework.beans.factory.config.BeanDefinition;
 import org.gqframework.beans.factory.support.BeanDefinitionRegistry;
+import org.gqframework.core.io.Resource;
+import org.gqframework.core.io.support.EncodedResource;
 
 public class XmlBeanFactory implements BeanDefinitionRegistry{
 
     private XmlBeanDefinitionReader reader = new XmlBeanDefinitionReader(this);
 
+    public XmlBeanFactory(Resource resource){
+        this.reader.loadBeanDefinitions(resource);
+    }
 
     @Override
     public void registerBeanDefinition(String beanName, BeanDefinition beanDefinition) throws BeanDefinitionStoreException {

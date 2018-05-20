@@ -1,8 +1,10 @@
 package org.gqframework.beans.factory.xml;
 
 import org.apache.log4j.Logger;
+import org.gqframework.beans.BeanUtils;
 import org.gqframework.beans.factory.BeanDefinitionStoreException;
 import org.gqframework.beans.factory.support.AbstractBeanDefinitionReader;
+import org.gqframework.beans.factory.support.BeanDefinitionReader;
 import org.gqframework.beans.factory.support.BeanDefinitionRegistry;
 import org.gqframework.core.NamedThreadLocal;
 import org.gqframework.core.io.ClassPathResource;
@@ -15,10 +17,7 @@ import org.gqframework.lang.Nullable;
 import org.gqframework.util.Assert;
 import org.gqframework.util.xml.XmlValidationModeDetector;
 import org.w3c.dom.Document;
-import org.xml.sax.EntityResolver;
-import org.xml.sax.InputSource;
-import org.xml.sax.SAXException;
-import org.xml.sax.SAXParseException;
+import org.xml.sax.*;
 
 import javax.xml.parsers.ParserConfigurationException;
 import java.io.IOException;
@@ -46,11 +45,19 @@ public class XmlBeanDefinitionReader extends AbstractBeanDefinitionReader {
     private final ThreadLocal<Set<EncodedResource>> resourcesCurrentlyBeingLoaded =
             new NamedThreadLocal<>("XML bean definition resources currently being loaded");
 
+    private Class<?> documentReaderClass = DefaultBeanDefinitionDocumentReader.class;
+
     private DocumentLoader documentLoader = new DefaultDocumentLoader();
     private EntityResolver entityResolver ;
     private ResourceLoader resourceLoader;
     @Nullable
     private ClassLoader beanClassLoader;
+    private boolean namespaceAware = false;
+
+    @Override
+    public int loadBeanDefinitions(String... locations) throws BeanDefinitionStoreException {
+        return super.loadBeanDefinitions(locations);
+    }
 
     public XmlBeanDefinitionReader(BeanDefinitionRegistry registry) {
         super(registry);
@@ -133,22 +140,44 @@ public class XmlBeanDefinitionReader extends AbstractBeanDefinitionReader {
     }
 
     protected Document doLoadDocument(InputSource inputSource, Resource resource) throws Exception {
-//        return this.documentLoader.loadDocument(inputSource, getEntityResolver(), this.errorHandler,
-//                getValidationModeForResource(resource), isNamespaceAware());
-        return null;
+        return this.documentLoader.loadDocument(inputSource, getEntityResolver(), new ErrorHandler() {
+                    @Override
+                    public void warning(SAXParseException exception) throws SAXException {
+                        throw exception;
+                    }
+
+                    @Override
+                    public void error(SAXParseException exception) throws SAXException {
+                        throw exception;
+                    }
+
+                    @Override
+                    public void fatalError(SAXParseException exception) throws SAXException {
+                        throw exception;
+                    }
+                },
+                getValidationModeForResource(resource), isNamespaceAware());
+    }
+
+    public boolean isNamespaceAware(){
+        return this.namespaceAware;
     }
 
     public int registerBeanDefinitions(Document doc, Resource resource) throws BeanDefinitionStoreException {
-//        BeanDefinitionDocumentReader documentReader = createBeanDefinitionDocumentReader();
-//        int countBefore = getRegistry().getBeanDefinitionCount();
-//        documentReader.registerBeanDefinitions(doc, createReaderContext(resource));
-//        return getRegistry().getBeanDefinitionCount() - countBefore;
-         return 0;
+        BeanDefinitionDocumentReader documentReader = createBeanDefinitionDocumentReader();
+        int countBefore = getRegistry().getBeanDefinitionCount();
+        documentReader.registerBeanDefinitions(doc, createReaderContext(resource));
+        return getRegistry().getBeanDefinitionCount() - countBefore;
     }
 
     protected BeanDefinitionDocumentReader createBeanDefinitionDocumentReader() {
-        //return BeanDefinitionDocumentReader.class.cast(BeanUtils.instantiateClass(this.documentReaderClass));
-        return null;
+        return BeanDefinitionDocumentReader.class.cast(BeanUtils.instantiateClass(this.documentReaderClass));
+    }
+
+    public XmlReaderContext createReaderContext(Resource resource) {
+        return new XmlReaderContext(resource,this);
+//        return new XmlReaderContext(resource, this.problemReporter, this.eventListener,
+//                this.sourceExtractor, this, getNamespaceHandlerResolver());
     }
 
     /**
@@ -176,9 +205,9 @@ public class XmlBeanDefinitionReader extends AbstractBeanDefinitionReader {
     }
 
     public static void main(String args[]){
-        XmlBeanFactory beanFactory = new XmlBeanFactory();
-        XmlBeanDefinitionReader reader = new XmlBeanDefinitionReader(beanFactory);
-        reader.loadBeanDefinitions(new ClassPathResource("classpath:org/gq/spring/ioc/../spring-mvc.xml"));
+//        XmlBeanFactory beanFactory = new XmlBeanFactory();
+//        XmlBeanDefinitionReader reader = new XmlBeanDefinitionReader(beanFactory);
+//        reader.loadBeanDefinitions(new ClassPathResource("classpath:org/gq/spring/ioc/../spring-mvc.xml"));
     }
 
     protected int detectValidationMode(Resource resource) {

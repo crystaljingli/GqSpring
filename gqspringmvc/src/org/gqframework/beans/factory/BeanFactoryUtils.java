@@ -3,8 +3,14 @@ package org.gqframework.beans.factory;
 import org.gq.spring.ioc.BeanFactory;
 import org.gqframework.util.Assert;
 
-public class BeanFactoryUtils {
-
+public abstract class BeanFactoryUtils {
+    /**
+     * 用于生成bean名称的分隔符;
+     */
+    public static final String GENERATED_BEAN_NAME_SEPARATOR = "#";
+    /**
+     * 工厂bean前缀
+     */
     public static final String FACTORY_BEAN_PREFIX = "&";
 
     /**
