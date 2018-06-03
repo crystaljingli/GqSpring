@@ -31,7 +31,7 @@ import org.gqframework.core.io.Resource;
 import org.gqframework.util.Assert;
 import org.gqframework.util.ResourceUtils;
 import org.gqframework.util.StringUtils;
-import org.gqframework.web.util.WebUtils;
+import org.gqframework.util.WebUtils;
 
 /**
  * {@link org.gqframework.core.io.Resource} implementation for
